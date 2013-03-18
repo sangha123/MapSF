@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<body>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script type="text/javascript">
+	$.getJSON('gxxq-x39z.json', function(data) { 
+		$.each(data, function(i,location){
+			alert("JSON Data: " + data[3].location.latitude+data[3].time);
+		});
+	//$.each(data, function(key, val) {
+ 	//	console.log("key=" + key + " " + "val=" + val);
+ 	//alert("JSON Data: " + data[3].location.latitude);
+	});
+</script>
+</body>
+</html>

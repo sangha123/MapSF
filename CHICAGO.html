@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Google Maps JavaScript API v3 Example: KmlLayer KML</title>
+        <link href="default.css" rel="stylesheet">  
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script>
+      function initialize() {
+        var chicago = new google.maps.LatLng(37.774546, -122.433523);
+        var mapOptions = {
+          zoom: 11,
+          center: chicago,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        }
+
+        var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+        var ctaLayer = new google.maps.KmlLayer('http://www.hep.anl.gov/sdeb/MapPrac/POPOS.kml');
+        ctaLayer.setMap(map);
+      }
+    </script>
+  </head>
+  <body onload="initialize()">
+    <div id="map-canvas"></div>
+  </body>
+</html>

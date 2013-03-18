@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>jQuery + Google Maps API v3 Demo</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script type="text/javascript" src="http://www.heatmapapi.com/Javascript/HeatmapAPIGoogle3.js"></script>
+<script type="text/javascript" src="http://www.heatmapapi.com/Javascript/HeatMapAPI3.aspx?k=3dac6fc1-81be-45e8-8308-cce5291cf4b8"></script>
+<script type="text/javascript">
+
+	var map;
+	
+	var LatSF = [];
+	var LngSF = [];
+	var myHeatmap = new GEOHeatmap();
+	var myData = null;	
+	
+	$(function (){
+		myData = new Array();
+		//alert("JSON1");
+		$.getJSON("gxxq-x39z.json", function(data){
+			//alert("JSON1");
+			$.each(data, function(i,location){
+				LatSF.push(data[i].location.latitude);
+				LngSF.push(data[i].location.longitude);	
+				myData.push(data[i].location.latitude);
+				myData.push(data[i].location.longitude);
+				myData.push(Math.floor(Math.random() * 10));
+				
+			});
+
+			myHeatmap.Init(800, 500); 
+			myHeatmap.SetBoost(0.8);	
+			myHeatmap.SetDecay(0); 
+			myHeatmap.SetData(myData);
+			myHeatmap.SetProxyURL('http://127.0.0.1:8000/proxy.php');
+		});
+
+		var centerCoord = new google.maps.LatLng(37.7750,-122.4183); // SF
+		var mapOptions = {
+			zoom: 10,
+			center: centerCoord,
+			mapTypeId: google.maps.MapTypeId.TERRAIN
+		};
+		map = new google.maps.Map(document.getElementById("map"), mapOptions);
+		google.maps.event.addListener(map, 'idle', function(event) {
+			//alert("whaaat???");
+ 		myHeatmap.AddOverlay(this, myHeatmap);
+	});
+	
+			
+	});
+
+
+</script>
+
+<style type="text/css" media="screen">
+	img { border: 0; }
+	#map{
+		width: 800px;
+		height: 500px; 
+	}
+	#content {
+		position: fixed;
+		top: 10px;
+		left: 800px;
+		margin: 30px;
+	}
+</style>
+</head>
+<body>
+<div id="container">
+	
+	<div id="map"></div>
+	<div id="content">
+	<p>this demo gives the crime map of SanFrancisco</ul>
+	</div>
+</div>	
+
+</body>
+</html>

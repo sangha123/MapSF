@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script
+src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAthv7zn_N9nVCyU59kewaH7XXm2Ypyh6g&libraries=visualization&sensor=false">
+</script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+
+<script>
+
+var sanFrancisco = new google.maps.LatLng(37.714548, -122.438588);
+
+var Data = {'location':sanFrancisco,'weight':1.0};
+var heatmapData = [];
+
+
+//heatmapData.location={};
+//heatmapData.weight={};
+//console.log(Data.location);
+//heatmapData.push(Data);
+//heatmapData.push(Data);
+//console.log(heatmapData);
+
+var fileJSON = ["Bayview.json", "Haight_Ashbury.json", "Ocean_View.json", "Russian_Hill.json","Bernal_Heights.json", "Inner_Richmond.json", "Outer_Mission.json",  "Seacliff.json","Chinatown.json",  "Inner_Sunset.json", "Outer_Richmond.json", "South_of_Market.json","Crocker_Amazon.json", "Lakeshore.json", "Outer_Sunset.json", "Twin_Peaks.json","Diamond_Heights.json", "Marina.json", "Pacific_Heights.json", "Visitacion_Valley.json", "Excelsior.json",  "Mission.json" ,   "Parkside.json",   "West_of_Twin_Peaks.json", "Financial_District.json", "Nob_Hill.json",   "Potrero_Hill.json", "Western_Addition.json","Glen_Park.json" ,   "Noe_Valley.json",   "Presidio.json", "Golden_Gate_Park.json", "North_Beach.json",  "Presidio_Heights.json"];
+
+function initialize()
+{
+  $.getJSON("CrimeWeight.json", function(data){
+      $.each(data, function(i,location){
+        var cmap = new google.maps.LatLng(data[i].location.latitude,data[i].location.longitude);
+        
+        heatmapData.push({'location':cmap,'weight':data[i].weight});
+              //console.log(heatmapData[i].weight);
+      });
+      
+    });
+    map = new google.maps.Map(document.getElementById('map_canvas'), {
+    center: sanFrancisco,
+    zoom: 12,
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+     });
+//console.log(heatmapData);
+
+//Process p = Runtime.getRuntime().exec(new String[]{"bash","-c","ls /Users/sanghamitradeb/JSites/NeighborhoodJSON/"});
+  
+  var heatmap = new google.maps.visualization.HeatmapLayer({
+  data: heatmapData });
+
+heatmap.setMap(map);
+  $.each(fileJSON,function(k,fileJSON){
+    console.log(fileJSON)
+  $.getJSON("NeighborhoodJSON/"+fileJSON, function(data0){
+    var LatLngPoly= []; 
+    var Lat=[];
+    var Lng=[];
+    $.each(data0.features, function(i,geometry){
+      var newData= data0.features[i].geometry;
+      if (newData.type=='Polygon'){
+        var CordArr= newData.coordinates[0];
+      }
+      else var CordArr= newData.coordinates[0][0];
+      $.each(CordArr, function(j,CordArr){
+        polyc = new google.maps.LatLng(CordArr[1],CordArr[0]);
+        LatLngPoly.push(polyc); 
+        Lat.push(CordArr[1]);
+        Lng.push(CordArr[0]);
+        //console.log(LatLngPoly[j]); 
+        //console.log(polyc); 
+        //console.log(CordArr[1],CordArr[0]);
+      });
+      //console.log(data0.features[i].geometry.coordinates);
+    });
+    var MinLat=Math.max(parseFloat(Lat));
+    var MinLng=Math.min(parseFloat(Lng));
+    console.log(MinLat,MinLng);
+    /*arrMarkers = new Array();
+   google.maps.event.addListener(map, 'click', function(event) {
+
+    marker = new google.maps.Marker({position: event.latLng, map: map});
+    arrMarkers = marker;
+    console.log(arrMarkers);
+});*/
+   //console.log(arrMarkers);
+  mapPoly = new google.maps.Polygon({
+                    paths: LatLngPoly,
+                    strokeColor: "#000000",
+                    strokeOpacity: 1.0,
+                    strokeWeight: 2,
+                    fillColor: "#000000",
+                    fillOpacity: 0.1
+                });
+
+  mapPoly.setMap(map);
+  //console.log(Lat);
+  var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(MinLat,MinLng ),
+          //map: map, 
+          title: "Marker"
+          });
+  var name=fileJSON;
+  var infowindow = new google.maps.InfoWindow({
+    //content: '<IMG BORDER="0" ALIGN="Left" SRC="20110520-IMG_1840.jpg"> My name is ' + name;
+    content: '<div id="content">'+name+' <IMG BORDER="0" style="width:70px;height:50px" ALIGN="Left" SRC="20110520-IMG_1840.jpg"/></div>'
+  });
+
+  polygonClick = google.maps.event.addListener( mapPoly, "mouseover", function( evt ) {
+    infowindow.open(map,marker);
+    //alert("Hello");
+  });
+});
+});
+var heatmap = new google.maps.visualization.HeatmapLayer({
+  data: heatmapData });
+
+heatmap.setMap(map);
+
+//var ctaLayer = new google.maps.KmlLayer('http://www.hep.anl.gov/sdeb/MapPrac/NeighborhoodfinalKML/North_Beach.kml');
+//ctaLayer.setMap(map);
+
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+</script>
+
+</head>
+
+<body>
+<div id="map_canvas" style="width:750px;height:580px;"></div>
+
+</body>
+</html>
