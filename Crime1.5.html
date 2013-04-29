@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<style type="text/css">
+#infoBar {
+    display:none;
+    pointer-events: none;
+    position: absolute;
+    /*background: url('gray.png');*/
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    padding: 10px 10px 10px 7px;
+    color: white;
+    z-index: 1337;
+    width: 300px;
+    left:870px;
+    top:10px;
+    height:300px;
+    text-align: center;
+}
+#infoBar .neighb{
+  margin-left: 5px;
+  font-size: 30px;
+  font-family: Arial, Verdana, sans-serif;
+  color:darkgreen;
+  line-height: 22px;
+}
+#inforBar .neighbimg{
+    float:left;
+    width: 130px;
+    margin-right: 10px;
+}
+</style>
+<script
+src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAthv7zn_N9nVCyU59kewaH7XXm2Ypyh6g&libraries=visualization&sensor=false">
+</script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+ <script type="text/javascript" src="http://d3js.org//d3.v3.min.js"></script>
+
+<script>
+
+var sanFrancisco = new google.maps.LatLng(37.714548, -122.438588);
+
+var Data = {'location':sanFrancisco,'weight':1.0};
+var heatmapData = [];
+
+
+//heatmapData.location={};
+//heatmapData.weight={};
+//console.log(Data.location);
+//heatmapData.push(Data);
+//heatmapData.push(Data);
+//console.log(heatmapData);
+
+var fileJSON = ["Bayview.json", "Haight_Ashbury.json", "Ocean_View.json", "Russian_Hill.json","Bernal_Heights.json", "Inner_Richmond.json", "Outer_Mission.json",  "Seacliff.json","Chinatown.json",  "Inner_Sunset.json", "Outer_Richmond.json", "South_of_Market.json","Crocker_Amazon.json", "Lakeshore.json", "Outer_Sunset.json", "Twin_Peaks.json","Diamond_Heights.json", "Marina.json", "Pacific_Heights.json", "Visitacion_Valley.json", "Excelsior.json",  "Mission.json" ,   "Parkside.json",   "West_of_Twin_Peaks.json", "Financial_District.json", "Nob_Hill.json",   "Potrero_Hill.json", "Western_Addition.json","Glen_Park.json" ,   "Noe_Valley.json",   "Presidio.json", "Golden_Gate_Park.json", "North_Beach.json",  "Presidio_Heights.json"];
+
+var filePNG=["Bayview.png", "Haight_Ashbury.png", "Ocean_View.png", "Russian_Hill.png","Bernal_Heights.png", "Inner_Richmond.png", "Outer_Mission.png",  "Seacliff.png","Chinatown.png",  "Inner_Sunset.png", "Outer_Richmond.png", "South_of_Market.png","Crocker_Amazon.png", "Lakeshore.png", "Outer_Sunset.png", "Twin_Peaks.png","Diamond_Heights.png", "Marina.png", "Pacific_Heights.png", "Visitacion_Valley.png", "Excelsior.png",  "Mission.png" ,   "Parkside.png",   "West_of_Twin_Peaks.png", "Financial_District.png", "Nob_Hill.png",   "Potrero_Hill.png", "Western_Addition.png","Glen_Park.png" ,   "Noe_Valley.png",   "Presidio.png", "Golden_Gate_Park.png", "North_Beach.png",  "Presidio_Heights.png"];
+
+var filePNGpie=["Bayviewpie.png", "Haight_Ashburypie.png", "Ocean_Viewpie.png", "Russian_Hillpie.png","Bernal_Heightspie.png", "Inner_Richmondpie.png", "Outer_Missionpie.png",  "Seacliffpie.png","Chinatownpie.png",  "Inner_Sunsetpie.png", "Outer_Richmondpie.png", "South_of_Marketpie.png","Crocker_Amazonpie.png", "Lakeshorepie.png", "Outer_Sunsetpie.png", "Twin_Peakspie.png","Diamond_Heightspie.png", "Marinapie.png", "Pacific_Heightspie.png", "Visitacion_Valleypie.png", "Excelsiorpie.png",  "Missionpie.png" ,   "Parksidepie.png",   "West_of_Twin_Peakspie.png", "Financial_Districtpie.png", "Nob_Hillpie.png",   "Potrero_Hillpie.png", "Western_Additionpie.png","Glen_Parkpie.png" ,   "Noe_Valleypie.png",   "Presidiopie.png", "Golden_Gate_Parkpie.png", "North_Beachpie.png",  "Presidio_Heightspie.png"];
+function initialize()
+{
+  $.getJSON("CrimeWeight.json", function(data){
+      $.each(data, function(i,location){
+        var cmap = new google.maps.LatLng(data[i].location.latitude,data[i].location.longitude);
+        
+        heatmapData.push({'location':cmap,'weight':data[i].weight});
+              //console.log(heatmapData[i].weight);
+      });
+      
+    });
+    map = new google.maps.Map(document.getElementById('map_canvas'), {
+    center: sanFrancisco,
+    zoom: 13,
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+     });
+//console.log(heatmapData);
+
+//Process p = Runtime.getRuntime().exec(new String[]{"bash","-c","ls /Users/sanghamitradeb/JSites/NeighborhoodJSON/"});
+  
+  var heatmap = new google.maps.visualization.HeatmapLayer({
+  data: heatmapData });
+
+  heatmap.setMap(map);
+  $.each(fileJSON,function(k,fileJSON){
+    
+   $.getJSON("NeighborhoodJSON/"+fileJSON, function(data0){
+    var LatLngPoly= []; 
+    var Lat=[];
+    var Lng=[];
+    $.each(data0.features, function(i,geometry){
+      var newData= data0.features[i].geometry;
+      if (newData.type=='Polygon'){
+        var CordArr= newData.coordinates[0];
+      }
+      else var CordArr= newData.coordinates[0][0];
+      $.each(CordArr, function(j,CordArr){
+        polyc = new google.maps.LatLng(CordArr[1],CordArr[0]);
+        LatLngPoly.push(polyc); 
+        Lat.push(CordArr[1]);
+        Lng.push(CordArr[0]);
+        //console.log(LatLngPoly[j]); 
+        //console.log(polyc); 
+        //console.log(CordArr[1],CordArr[0]);
+      });
+      //console.log(data0.features[i].geometry.coordinates);
+    });
+    var MinLat=(Math.min(parseFloat(Lat))+Math.max(parseFloat(Lat)))/2.0;
+    var MinLng=(Math.min(parseFloat(Lng))+Math.max(parseFloat(Lng)))/2.0;
+    console.log(MinLat,MinLng);
+    /*arrMarkers = new Array();
+   google.maps.event.addListener(map, 'click', function(event) {
+
+    marker = new google.maps.Marker({position: event.latLng, map: map});
+    arrMarkers = marker;
+    console.log(arrMarkers);
+});*/
+   //console.log(arrMarkers);
+   mapPoly = new google.maps.Polygon({
+                    paths: LatLngPoly,
+                    strokeColor: "#000000",
+                    strokeOpacity: 1.0,
+                    strokeWeight: 2,
+                    fillColor: "#000000",
+                    fillOpacity: 0.1
+                });
+
+   mapPoly.setMap(map);
+  //console.log(Lat);
+   var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(MinLat,MinLng),
+          //map: map, 
+          title: "Marker"
+          });
+   var strChars=fileJSON.split(".");
+   var name=strChars[0].replace(/_/g, " ");
+   //console.log(filePNG[k])
+   //var infowindow = new google.maps.InfoWindow({
+    //content: '<IMG BORDER="0" ALIGN="Left" SRC="20110520-IMG_1840.jpg"> My name is ' + name;
+    //content: '<div id="content">'+name+' <IMG BORDER="0" style="width:320px;height:300px" ALIGN="Left" SRC='+filePNGpie[k]+'></div>'
+  //});
+  var infB = d3.select("#infoBar")
+   polygonClick = google.maps.event.addListener( mapPoly, "mouseover", function( evt ) {
+    //infowindow.open(map,marker);
+    infB.style('display','block');
+    infB.select(".neighb").text(name);
+    infB.select(".neighbimg img").attr("src","PieImg/"+filePNGpie[k]).attr("width","300px");
+    //alert("Hello");
+  });
+
+  google.maps.event.addListener(mapPoly, 'mouseout', function(evt) {
+    //infowindow.close();
+    infB.style('display','none');
+});
+
+});
+});
+
+
+//var ctaLayer = new google.maps.KmlLayer('http://www.hep.anl.gov/sdeb/MapPrac/NeighborhoodfinalKML/North_Beach.kml');
+//ctaLayer.setMap(map);
+
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+</script>
+
+</head>
+
+<body>
+<div id="map_canvas" style="width:850px;height:880px;"></div>
+<div id="infoBar"> 
+    <p class='neighb'> hbhbhbh</p> 
+    <p  class ='neighbimg'><img src = 'blah.png'/> </p>
+     
+</div>
+</body>
+</html>
